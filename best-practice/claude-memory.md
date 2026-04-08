@@ -1,5 +1,7 @@
 # Claude Memory
 
+![Last Updated](https://img.shields.io/badge/Last_Updated-Apr%2008%2C%202026-white?style=flat&labelColor=555) ![Version](https://img.shields.io/badge/Claude_Code-v2.1.92-blue?style=flat&labelColor=555)
+
 Persistent context via CLAUDE.md files — how to write them and how they load in monorepos.
 
 <table width="100%">
@@ -114,8 +116,80 @@ claude
 
 ---
 
+## 3. Importing Files into CLAUDE.md
+
+CLAUDE.md files can import additional files using `@path/to/import` syntax. Imported files are expanded and loaded into context at launch alongside the CLAUDE.md that references them.
+
+```markdown
+See @README.md for project overview and @package.json for available npm commands.
+
+# Additional Instructions
+- Git workflow: @docs/git-instructions.md
+- Personal overrides: @~/.claude/my-project-instructions.md
+```
+
+**Rules:**
+- Both relative and absolute paths are supported
+- Relative paths resolve relative to the file containing the import, not the working directory
+- Imported files can recursively import other files — maximum depth of 5 hops
+- The first time Claude Code encounters external imports in a project, it shows an approval dialog; if declined, imports stay disabled
+
+**Sharing instructions across git worktrees:** A gitignored `CLAUDE.local.md` only exists in the worktree where you created it. To share personal instructions across all worktrees of the same repo, import from your home directory:
+
+```markdown
+# Individual Preferences
+- @~/.claude/my-project-instructions.md
+```
+
+**Importing an `AGENTS.md`** used by other coding agents:
+
+```markdown
+@AGENTS.md
+
+## Claude Code
+Use plan mode for changes under `src/billing/`.
+```
+
+---
+
+## 4. What to Write in CLAUDE.md (Do / Don't)
+
+A bloated CLAUDE.md causes Claude to ignore your actual instructions. Target **under 200 lines** per file and ruthlessly prune.
+
+| ✅ Include | ❌ Exclude |
+|-----------|-----------|
+| Bash commands Claude cannot guess | Anything Claude can figure out by reading code |
+| Code style rules that differ from defaults | Standard language conventions Claude already knows |
+| Testing instructions and preferred test runners | Detailed API documentation (link to docs instead) |
+| Repository etiquette (branch naming, PR conventions) | Information that changes frequently |
+| Architectural decisions specific to your project | Long explanations or tutorials |
+| Developer environment quirks (required env vars) | File-by-file descriptions of the codebase |
+| Common gotchas or non-obvious behaviors | Self-evident practices like "write clean code" |
+
+**Diagnostic tests:**
+- If Claude keeps doing something wrong despite a rule against it → the file is too long and the rule is getting lost
+- If Claude asks questions that are answered in CLAUDE.md → the phrasing is ambiguous
+- For each line ask: *"Would removing this cause Claude to make mistakes?"* If not, cut it
+
+**Emphasis improves adherence.** Adding `IMPORTANT` or `YOU MUST` to a rule makes Claude follow it more reliably.
+
+**Large CLAUDE.md files:** Use `@path/to/import` imports or split instructions into `.claude/rules/` files. Rules in `.claude/rules/` can be scoped to specific file types via `paths` frontmatter:
+
+```markdown
+---
+paths:
+  - "src/api/**/*.ts"
+---
+
+# API Rules
+- All endpoints must include input validation
+- Use the standard error response format
+```
+
+---
+
 ## Sources
 
-- [Claude Code Documentation - How Claude Looks Up Memories](https://code.claude.com/docs/en/memory#how-claude-looks-up-memories)
+- [Claude Code Documentation - Memory](https://code.claude.com/docs/en/memory)
 - [Boris Cherny on X - Clarification on CLAUDE.md Loading](https://x.com/bcherny/status/2016339448863355206)
 - [Humanlayer - Writing a good Claude.md](https://www.humanlayer.dev/blog/writing-a-good-claude-md)
