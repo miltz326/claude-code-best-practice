@@ -1,6 +1,6 @@
 # MCP Servers Best Practice
 
-![Last Updated](https://img.shields.io/badge/Last_Updated-Mar%2002%2C%202026%2012%3A30%20PM%20PKT-white?style=flat&labelColor=555)<br>
+![Last Updated](https://img.shields.io/badge/Last_Updated-Apr%2008%2C%202026-white?style=flat&labelColor=555) ![Version](https://img.shields.io/badge/Claude_Code-v2.1.92-blue?style=flat&labelColor=555)<br>
 [![Implemented](https://img.shields.io/badge/Implemented-2ea44f?style=flat)](../.mcp.json)
 
 MCP (Model Context Protocol) servers extend Claude Code with connections to external tools, databases, and APIs. This guide covers recommended servers for daily use and configuration best practices.
@@ -124,9 +124,64 @@ Precedence: Subagent > Project > User
 
 ---
 
+## Managed MCP Configuration
+
+For organizations that need centralized control over MCP servers, Claude Code supports two options:
+
+### Option 1: Exclusive Control with `managed-mcp.json`
+
+Deploy a `managed-mcp.json` file to take **exclusive control** over all MCP servers. Users cannot add, modify, or use any MCP servers other than those defined in this file.
+
+**File locations (system-wide, requires admin privileges):**
+
+| OS | Path |
+|----|------|
+| macOS | `/Library/Application Support/ClaudeCode/managed-mcp.json` |
+| Linux / WSL | `/etc/claude-code/managed-mcp.json` |
+| Windows | `C:\Program Files\ClaudeCode\managed-mcp.json` |
+
+The file uses the same format as a standard `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.io/mcp"
+    },
+    "internal-tools": {
+      "command": "npx",
+      "args": ["-y", "@acme/internal-mcp-server"]
+    }
+  }
+}
+```
+
+When `managed-mcp.json` exists, `claude mcp add` and all user/project configuration files are ignored for MCP. Allowlists/denylists from `managed-settings.json` still apply to filter which managed servers are actually loaded.
+
+### Option 2: Policy-Based Control (Allowlists/Denylists)
+
+Allow users to configure their own MCP servers, but restrict which ones are permitted. Configure `allowedMcpServers` and `deniedMcpServers` in `managed-settings.json`.
+
+Each entry can restrict by:
+1. **`serverName`**: matches the configured name
+2. **`serverCommand`**: matches the exact command and arguments for stdio servers
+3. **`serverUrl`**: matches remote server URLs with wildcard support
+
+**Choosing between options:**
+- Use `managed-mcp.json` for a fixed set of servers with no user customization
+- Use allowlists/denylists when users can add their own servers within policy constraints
+
+---
+
 ## Sources
 
-- [MCP Servers — Claude Code Docs](https://code.claude.com/docs/en/mcp)
+- [MCP — Claude Code Docs](https://code.claude.com/docs/en/mcp)
+- [Managed MCP Configuration — Claude Code Docs](https://code.claude.com/docs/en/mcp#managed-mcp-configuration)
 - [Model Context Protocol Specification](https://modelcontextprotocol.io/)
 - [5 MCPs that have genuinely made me 10x faster — r/mcp](https://reddit.com/r/mcp/comments/1qarjqm/)
 - [MCP Server Overload Discussion — r/mcp](https://reddit.com/r/mcp/comments/1mj0fxs/)
