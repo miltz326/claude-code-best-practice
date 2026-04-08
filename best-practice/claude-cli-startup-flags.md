@@ -1,6 +1,6 @@
 # CLI Startup Flags Best Practice
 
-![Last Updated](https://img.shields.io/badge/Last_Updated-Mar%2002%2C%202026-white?style=flat&labelColor=555)
+![Last Updated](https://img.shields.io/badge/Last_Updated-Apr%2008%2C%202026-white?style=flat&labelColor=555) ![Version](https://img.shields.io/badge/Claude_Code-v2.1.92-blue?style=flat&labelColor=555)
 
 Reference for Claude Code startup flags, top-level subcommands, and startup environment variables when launching Claude Code from the terminal.
 
@@ -65,7 +65,8 @@ Reference for Claude Code startup flags, top-level subcommands, and startup envi
 |------|-------|-------------|
 | `--dangerously-skip-permissions` | | Skip ALL permission prompts. Use with extreme caution |
 | `--allow-dangerously-skip-permissions` | | Enable permission bypassing as an option without activating it |
-| `--permission-mode <MODE>` | | Begin in specified permission mode: `default`, `plan`, `acceptEdits`, `bypassPermissions` |
+| `--permission-mode <MODE>` | | Begin in specified permission mode: `default`, `plan`, `acceptEdits`, `auto`, `dontAsk`, `bypassPermissions` |
+| `--enable-auto-mode` | | Add `auto` mode to the `Shift+Tab` cycle without immediately activating it. Requires Team/Enterprise plan with Sonnet/Opus 4.6 on Anthropic API |
 | `--allowedTools <TOOLS>` | | Tools that execute without prompting (permission rule syntax) |
 | `--disallowedTools <TOOLS>` | | Tools removed from model context entirely |
 | `--tools <TOOLS>` | | Restrict which built-in tools Claude can use (use `""` to disable all) |
@@ -142,6 +143,7 @@ Reference for Claude Code startup flags, top-level subcommands, and startup envi
 | `--chrome` | | Enable Chrome browser integration for web automation |
 | `--no-chrome` | | Disable Chrome browser integration for this session |
 | `--ide` | | Automatically connect to IDE on startup if exactly one valid IDE available |
+| `--channels <PLUGINS>` | | Enable channel plugins that push events into the session (e.g., Telegram, Discord, iMessage). Space-separated plugin names in the format `plugin:name@marketplace` |
 
 ---
 
